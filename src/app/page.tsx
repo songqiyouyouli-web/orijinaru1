@@ -1,68 +1,94 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+
+import { ListingResultEditor } from "@/components/ListingResultEditor";
+import { ManualFieldsForm } from "@/components/ManualFieldsForm";
+import { PhotoUploader, type PhotoItem } from "@/components/PhotoUploader";
+import type { GenerateListingResponseBody, ListingAiOutput, ManualInput } from "@/types/listing";
+
+const DEFAULT_MANUAL: ManualInput = {
+  condition: "no-notable-damage",
+  brand: "",
+  purchasePrice: undefined,
+  genre: "",
+  material: "",
+  size: {},
+};
 
 export default function Home() {
+  const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  const [manual, setManual] = useState<ManualInput>(DEFAULT_MANUAL);
+  const [aiOutput, setAiOutput] = useState<ListingAiOutput | null>(null);
+  const [resultKey, setResultKey] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = photos.length > 0 && manual.genre.trim().length > 0;
+
+  async function handleSubmit() {
+    if (!canSubmit) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: photos.map(({ base64, mediaType }) => ({ base64, mediaType })),
+          manual,
+        }),
+      });
+
+      const data = (await res.json()) as GenerateListingResponseBody & { error?: string };
+
+      if (!res.ok || !data.output) {
+        setError(data.error ?? "出品文の生成に失敗しました。");
+        return;
+      }
+
+      setAiOutput(data.output);
+      setResultKey((key) => key + 1);
+    } catch {
+      setError("通信エラーが発生しました。時間をおいて再度お試しください。");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10 sm:px-6">
+        <header>
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+            メルカリ出品文メーカー
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            商品写真を撮るだけで、出品に必要な文章一式を下書きします
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        </header>
+
+        <section className="flex flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+          <PhotoUploader photos={photos} onChange={setPhotos} />
+          <ManualFieldsForm value={manual} onChange={setManual} />
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmit || loading}
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            {loading ? "生成中..." : "出品文を生成する"}
+          </button>
+
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        </section>
+
+        {aiOutput && (
+          <ListingResultEditor key={resultKey} aiOutput={aiOutput} manual={manual} />
+        )}
       </main>
     </div>
   );
