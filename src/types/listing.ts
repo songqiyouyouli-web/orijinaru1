@@ -6,11 +6,22 @@ export type ConditionValue =
   | "damage"
   | "poor";
 
+export type ClothingCategory = "tops" | "pants" | "skirt" | "shoes" | "bag" | "other";
+
 export interface SizeMeasurements {
   shoulder?: string;
   bust?: string;
   sleeve?: string;
   length?: string;
+  waist?: string;
+  rise?: string;
+  inseam?: string;
+  thigh?: string;
+  hem?: string;
+  shoeSize?: string;
+  bagWidth?: string;
+  bagHeight?: string;
+  bagDepth?: string;
   note?: string;
 }
 
@@ -18,8 +29,7 @@ export interface ManualInput {
   condition: ConditionValue;
   brand?: string;
   purchasePrice?: number;
-  genre: string;
-  material: string;
+  category: ClothingCategory;
   size: SizeMeasurements;
 }
 
@@ -30,6 +40,8 @@ export interface ImageInput {
 
 export interface ListingAiOutput {
   title: string;
+  genre: string;
+  material: string;
   featureParagraph: string;
   coordinateSuggestions: [string, string];
   styleTags: string[];
@@ -61,4 +73,8 @@ export interface SheetAppendRequestBody {
 
 export interface SheetAppendResponseBody {
   ok: true;
+}
+
+export interface NextManagementNumberResponseBody {
+  managementNumber: string;
 }

@@ -6,16 +6,15 @@ import {
   GREETING_BLOCK,
   INQUIRY_LINE,
   SHIPPING_BLOCK,
+  SIZE_FIELD_CONFIG,
 } from "@/lib/constants";
 import type { ListingAiOutput, ManualInput } from "@/types/listing";
 
 function formatSize(manual: ManualInput): string {
-  const { size } = manual;
-  const lines: string[] = [];
-  if (size.shoulder) lines.push(`・肩幅:約${size.shoulder}`);
-  if (size.bust) lines.push(`・身幅:約${size.bust}`);
-  if (size.sleeve) lines.push(`・袖丈:約${size.sleeve}`);
-  if (size.length) lines.push(`・着丈:約${size.length}`);
+  const { size, category } = manual;
+  const lines = SIZE_FIELD_CONFIG[category]
+    .filter(({ key }) => size[key])
+    .map(({ key, label }) => `・${label}:約${size[key]}`);
   if (size.note) lines.push(`・${size.note}`);
   return lines.join("\n");
 }
@@ -47,7 +46,7 @@ export function assembleListingText(
   const detailBlock = [
     `【カラー】 ${aiOutput.color}`,
     "",
-    `【素材】 ${manual.material}`,
+    `【素材】 ${aiOutput.material}`,
     "",
     `【状態】 ${conditionLabel}`,
     "",

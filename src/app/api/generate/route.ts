@@ -1,3 +1,4 @@
+import { google } from "@ai-sdk/google";
 import { Output, generateText } from "ai";
 import { z } from "zod";
 
@@ -26,13 +27,21 @@ const requestSchema = z.object({
     ]),
     brand: z.string().trim().max(100).optional(),
     purchasePrice: z.number().positive().optional(),
-    genre: z.string().trim().min(1).max(100),
-    material: z.string().trim().max(200),
+    category: z.enum(["tops", "pants", "skirt", "shoes", "bag", "other"]),
     size: z.object({
       shoulder: z.string().trim().max(20).optional(),
       bust: z.string().trim().max(20).optional(),
       sleeve: z.string().trim().max(20).optional(),
       length: z.string().trim().max(20).optional(),
+      waist: z.string().trim().max(20).optional(),
+      rise: z.string().trim().max(20).optional(),
+      inseam: z.string().trim().max(20).optional(),
+      thigh: z.string().trim().max(20).optional(),
+      hem: z.string().trim().max(20).optional(),
+      shoeSize: z.string().trim().max(20).optional(),
+      bagWidth: z.string().trim().max(20).optional(),
+      bagHeight: z.string().trim().max(20).optional(),
+      bagDepth: z.string().trim().max(20).optional(),
       note: z.string().trim().max(200).optional(),
     }),
   }),
@@ -53,7 +62,7 @@ export async function POST(req: Request) {
 
   try {
     const result = await generateText({
-      model: "anthropic/claude-sonnet-5",
+      model: google("gemini-3.8-flash"),
       system: buildSystemPrompt(),
       messages: [
         {
@@ -69,6 +78,11 @@ export async function POST(req: Request) {
         },
       ],
       output: Output.object({ schema: listingAiOutputSchema }),
+      providerOptions: {
+        google: {
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      },
     });
 
     return Response.json({ output: result.output });

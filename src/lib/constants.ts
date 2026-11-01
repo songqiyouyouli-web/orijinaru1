@@ -1,4 +1,9 @@
-import type { ConditionValue, SheetAppendRequestBody } from "@/types/listing";
+import type {
+  ClothingCategory,
+  ConditionValue,
+  SheetAppendRequestBody,
+  SizeMeasurements,
+} from "@/types/listing";
 
 export const CONDITION_OPTIONS: { value: ConditionValue; label: string }[] = [
   { value: "new", label: "新品、未使用" },
@@ -8,6 +13,45 @@ export const CONDITION_OPTIONS: { value: ConditionValue; label: string }[] = [
   { value: "damage", label: "傷や汚れあり" },
   { value: "poor", label: "全体的に状態が悪い" },
 ];
+
+export const CATEGORY_OPTIONS: { value: ClothingCategory; label: string }[] = [
+  { value: "tops", label: "トップス／ワンピース／アウター" },
+  { value: "pants", label: "パンツ" },
+  { value: "skirt", label: "スカート" },
+  { value: "shoes", label: "靴" },
+  { value: "bag", label: "バッグ" },
+  { value: "other", label: "その他" },
+];
+
+export const SIZE_FIELD_CONFIG: Record<
+  ClothingCategory,
+  { key: keyof SizeMeasurements; label: string }[]
+> = {
+  tops: [
+    { key: "shoulder", label: "肩幅" },
+    { key: "bust", label: "身幅" },
+    { key: "sleeve", label: "袖丈" },
+    { key: "length", label: "着丈" },
+  ],
+  pants: [
+    { key: "waist", label: "ウエスト" },
+    { key: "rise", label: "股上" },
+    { key: "inseam", label: "股下" },
+    { key: "thigh", label: "もも幅" },
+    { key: "hem", label: "裾幅" },
+  ],
+  skirt: [
+    { key: "waist", label: "ウエスト" },
+    { key: "length", label: "丈" },
+  ],
+  shoes: [{ key: "shoeSize", label: "サイズ(cm)" }],
+  bag: [
+    { key: "bagWidth", label: "幅" },
+    { key: "bagHeight", label: "高さ" },
+    { key: "bagDepth", label: "マチ" },
+  ],
+  other: [],
+};
 
 export const MAX_PHOTOS = 5;
 

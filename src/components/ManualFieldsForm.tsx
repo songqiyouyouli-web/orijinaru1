@@ -1,6 +1,6 @@
 "use client";
 
-import { CONDITION_OPTIONS } from "@/lib/constants";
+import { CATEGORY_OPTIONS, CONDITION_OPTIONS, SIZE_FIELD_CONFIG } from "@/lib/constants";
 import type { ManualInput } from "@/types/listing";
 
 interface ManualFieldsFormProps {
@@ -22,6 +22,8 @@ export function ManualFieldsForm({ value, onChange }: ManualFieldsFormProps) {
   ) {
     onChange({ ...value, size: { ...value.size, [key]: v } });
   }
+
+  const sizeFields = SIZE_FIELD_CONFIG[value.category];
 
   return (
     <div className="flex flex-col gap-4">
@@ -45,14 +47,21 @@ export function ManualFieldsForm({ value, onChange }: ManualFieldsFormProps) {
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-            ジャンル
+            カテゴリー
           </label>
-          <input
+          <select
             className={inputClass}
-            value={value.genre}
-            onChange={(e) => update("genre", e.target.value)}
-            placeholder="例: レディース ロングワンピース"
-          />
+            value={value.category}
+            onChange={(e) =>
+              update("category", e.target.value as ManualInput["category"])
+            }
+          >
+            {CATEGORY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -84,53 +93,44 @@ export function ManualFieldsForm({ value, onChange }: ManualFieldsFormProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">素材</label>
-        <input
-          className={inputClass}
-          value={value.material}
-          onChange={(e) => update("material", e.target.value)}
-          placeholder="例: レーヨン40% 綿30% ポリエステル30%"
-        />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-          サイズ実寸（cm）
-        </label>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {sizeFields.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            サイズ実寸（cm）
+          </label>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {sizeFields.map(({ key, label }) => (
+              <input
+                key={key}
+                className={inputClass}
+                placeholder={label}
+                value={value.size[key] ?? ""}
+                onChange={(e) => updateSize(key, e.target.value)}
+              />
+            ))}
+          </div>
           <input
             className={inputClass}
-            placeholder="肩幅"
-            value={value.size.shoulder ?? ""}
-            onChange={(e) => updateSize("shoulder", e.target.value)}
-          />
-          <input
-            className={inputClass}
-            placeholder="身幅"
-            value={value.size.bust ?? ""}
-            onChange={(e) => updateSize("bust", e.target.value)}
-          />
-          <input
-            className={inputClass}
-            placeholder="袖丈"
-            value={value.size.sleeve ?? ""}
-            onChange={(e) => updateSize("sleeve", e.target.value)}
-          />
-          <input
-            className={inputClass}
-            placeholder="着丈"
-            value={value.size.length ?? ""}
-            onChange={(e) => updateSize("length", e.target.value)}
+            placeholder="その他の採寸メモ（任意）"
+            value={value.size.note ?? ""}
+            onChange={(e) => updateSize("note", e.target.value)}
           />
         </div>
-        <input
-          className={inputClass}
-          placeholder="その他の採寸メモ（任意）"
-          value={value.size.note ?? ""}
-          onChange={(e) => updateSize("note", e.target.value)}
-        />
-      </div>
+      )}
+
+      {sizeFields.length === 0 && (
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            サイズ・採寸メモ
+          </label>
+          <input
+            className={inputClass}
+            placeholder="自由に記入してください"
+            value={value.size.note ?? ""}
+            onChange={(e) => updateSize("note", e.target.value)}
+          />
+        </div>
+      )}
     </div>
   );
 }

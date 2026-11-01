@@ -11,8 +11,7 @@ const DEFAULT_MANUAL: ManualInput = {
   condition: "no-notable-damage",
   brand: "",
   purchasePrice: undefined,
-  genre: "",
-  material: "",
+  category: "tops",
   size: {},
 };
 
@@ -24,7 +23,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = photos.length > 0 && manual.genre.trim().length > 0;
+  const canSubmit = photos.length > 0;
+
+  function handleReset() {
+    setPhotos([]);
+    setManual(DEFAULT_MANUAL);
+    setAiOutput(null);
+    setError(null);
+  }
 
   async function handleSubmit() {
     if (!canSubmit) return;
@@ -87,7 +93,12 @@ export default function Home() {
         </section>
 
         {aiOutput && (
-          <ListingResultEditor key={resultKey} aiOutput={aiOutput} manual={manual} />
+          <ListingResultEditor
+            key={resultKey}
+            aiOutput={aiOutput}
+            manual={manual}
+            onReset={handleReset}
+          />
         )}
       </main>
     </div>
