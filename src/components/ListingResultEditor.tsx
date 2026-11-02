@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { CATEGORY_OPTIONS } from "@/lib/constants";
 import { assembleListingText } from "@/lib/listing-assembly";
 import type {
   ListingAiOutput,
@@ -24,7 +25,10 @@ const inputClass =
 // without an effect-based sync.
 export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResultEditorProps) {
   const [title, setTitle] = useState(aiOutput.title);
-  const [genre, setGenre] = useState(aiOutput.genre);
+  const [genre, setGenre] = useState(
+    CATEGORY_OPTIONS.find((option) => option.value === manual.category)?.label ??
+      manual.category,
+  );
   const [bodyText, setBodyText] = useState(() => assembleListingText(aiOutput, manual));
   const [managementNumber, setManagementNumber] = useState("");
   const [managementNumberLoading, setManagementNumberLoading] = useState(true);
@@ -137,7 +141,7 @@ export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResult
 
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-          ジャンル（AIが写真から判定。保存先シートの「ジャンル」欄に使われます）
+          ジャンル（選んだカテゴリーから自動設定。保存先シートの「ジャンル」欄に使われます）
         </label>
         <input
           className={inputClass}

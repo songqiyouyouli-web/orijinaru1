@@ -5,9 +5,6 @@ export const listingAiOutputSchema = z.object({
     .string()
     .max(40)
     .describe("商品名。年代+vintage+特徴+アイテム種別+丈感+サイズ、40字以内"),
-  genre: z
-    .string()
-    .describe("写真から判断したジャンル（例: レディース ロングワンピース）。雰囲気を表す参考情報で、メルカリの正式カテゴリー階層ではない"),
   material: z
     .string()
     .describe("写真のタグ等から読み取れる、または見た目から推測した素材（例: コットン100%、デニム）。読み取れない場合は見た目からの推測と分かるように書く"),

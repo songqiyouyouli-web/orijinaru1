@@ -6,7 +6,14 @@ export type ConditionValue =
   | "damage"
   | "poor";
 
-export type ClothingCategory = "tops" | "pants" | "skirt" | "shoes" | "bag" | "other";
+export type ClothingCategory =
+  | "tops"
+  | "bottoms"
+  | "dress"
+  | "outer"
+  | "shoes"
+  | "bag"
+  | "other";
 
 export interface SizeMeasurements {
   shoulder?: string;
@@ -40,7 +47,6 @@ export interface ImageInput {
 
 export interface ListingAiOutput {
   title: string;
-  genre: string;
   material: string;
   featureParagraph: string;
   coordinateSuggestions: [string, string];

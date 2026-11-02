@@ -27,7 +27,7 @@ const requestSchema = z.object({
     ]),
     brand: z.string().trim().max(100).optional(),
     purchasePrice: z.number().positive().optional(),
-    category: z.enum(["tops", "pants", "skirt", "shoes", "bag", "other"]),
+    category: z.enum(["tops", "bottoms", "dress", "outer", "shoes", "bag", "other"]),
     size: z.object({
       shoulder: z.string().trim().max(20).optional(),
       bust: z.string().trim().max(20).optional(),

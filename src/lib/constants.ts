@@ -15,11 +15,12 @@ export const CONDITION_OPTIONS: { value: ConditionValue; label: string }[] = [
 ];
 
 export const CATEGORY_OPTIONS: { value: ClothingCategory; label: string }[] = [
-  { value: "tops", label: "トップス／ワンピース／アウター" },
-  { value: "pants", label: "パンツ" },
-  { value: "skirt", label: "スカート" },
-  { value: "shoes", label: "靴" },
+  { value: "tops", label: "トップス" },
+  { value: "bottoms", label: "ボトムス" },
+  { value: "dress", label: "ワンピース" },
+  { value: "outer", label: "アウター" },
   { value: "bag", label: "バッグ" },
+  { value: "shoes", label: "シューズ" },
   { value: "other", label: "その他" },
 ];
 
@@ -33,16 +34,25 @@ export const SIZE_FIELD_CONFIG: Record<
     { key: "sleeve", label: "袖丈" },
     { key: "length", label: "着丈" },
   ],
-  pants: [
+  bottoms: [
     { key: "waist", label: "ウエスト" },
     { key: "rise", label: "股上" },
     { key: "inseam", label: "股下" },
     { key: "thigh", label: "もも幅" },
     { key: "hem", label: "裾幅" },
-  ],
-  skirt: [
-    { key: "waist", label: "ウエスト" },
     { key: "length", label: "丈" },
+  ],
+  dress: [
+    { key: "shoulder", label: "肩幅" },
+    { key: "bust", label: "身幅" },
+    { key: "sleeve", label: "袖丈" },
+    { key: "length", label: "着丈" },
+  ],
+  outer: [
+    { key: "shoulder", label: "肩幅" },
+    { key: "bust", label: "身幅" },
+    { key: "sleeve", label: "袖丈" },
+    { key: "length", label: "着丈" },
   ],
   shoes: [{ key: "shoeSize", label: "サイズ(cm)" }],
   bag: [
