@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# メルカリ出品文メーカー
 
-## Getting Started
+商品写真と簡単な手入力情報から、AIがメルカリの出品文を自動で下書きしてくれるツールです。
+出来上がった文章はその場で編集し、Googleスプレッドシートに1行として保存できます。
 
-First, run the development server:
+## 公開URL
+
+https://orijinaru1.vercel.app
+
+## スクリーンショット
+
+![トップ画面](docs/screenshot.png)
+
+## 使い方
+
+1. 商品写真をアップロード（最大5枚）
+2. 商品の状態・カテゴリー・サイズなどを入力
+3. 「出品文を生成する」を押すと、AIが出品文の下書きを作成
+4. 画面上で文章を編集し、保存するとGoogleスプレッドシートに自動で1行追加される
+
+## 技術スタック
+
+- [Next.js](https://nextjs.org/) 16（App Router / Cache Components・PPR有効）
+- [React](https://react.dev/) 19 / TypeScript
+- [Tailwind CSS](https://tailwindcss.com/) 4
+- [Vercel AI SDK](https://ai-sdk.dev/)（`generateText` + 構造化出力）/ Google Gemini
+- [Zod](https://zod.dev/)（入力・出力のスキーマ検証）
+- [googleapis](https://github.com/googleapis/google-api-nodejs-client)（Google Sheets APIへの書き込み）
+- [Vercel](https://vercel.com/) にデプロイ
+
+## ローカルでの開発
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) を開くと確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env.local` に以下の環境変数が必要です。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `GOOGLE_GENERATIVE_AI_API_KEY`
+- `GOOGLE_SERVICE_ACCOUNT_KEY`（Google サービスアカウントのJSONをbase64エンコードしたもの）
+- `GOOGLE_SHEET_ID`
+- `GOOGLE_SHEET_TAB_NAME`（任意）
