@@ -41,6 +41,7 @@ export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResult
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // 管理番号だけはスプレッドシートの最新状態に依存するため、他の state と違い
   // props から同期的に決められない。このコンポーネントで唯一の effect。
@@ -74,6 +75,12 @@ export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResult
       cancelled = true;
     };
   }, []);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(bodyText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   function handleReset() {
     if (!saveMessage) {
@@ -151,9 +158,18 @@ export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResult
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-          商品説明文（素材もAIが判定して本文に入れています。間違っていればここで直接編集してください）
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            商品説明文（素材もAIが判定して本文に入れています。間違っていればここで直接編集してください）
+          </label>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="whitespace-nowrap rounded-md border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-900 dark:border-zinc-700 dark:text-zinc-50"
+          >
+            {copied ? "コピーしました" : "本文をコピー"}
+          </button>
+        </div>
         <textarea
           className={`${inputClass} min-h-80 font-mono`}
           value={bodyText}
@@ -166,6 +182,10 @@ export function ListingResultEditor({ aiOutput, manual, onReset }: ListingResult
           <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
             最終価格（円）
           </label>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            AI参考価格帯：¥{aiOutput.priceRangeLow.toLocaleString()}〜¥
+            {aiOutput.priceRangeHigh.toLocaleString()}
+          </p>
           <input
             type="number"
             className={inputClass}

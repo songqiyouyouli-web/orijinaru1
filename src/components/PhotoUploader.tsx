@@ -13,13 +13,41 @@ interface PhotoUploaderProps {
   onChange: (photos: PhotoItem[]) => void;
 }
 
-function readFileAsDataUrl(file: File): Promise<string> {
+// AIが特徴を読み取るのに十分な画質を保ちつつ、送信データ量を抑えて生成を速くする
+const MAX_DIMENSION = 1600;
+const JPEG_QUALITY = 0.82;
+
+function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
+    img.src = url;
   });
+}
+
+async function resizeImage(file: File): Promise<PhotoItem> {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const img = await loadImage(objectUrl);
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+    const width = Math.round(img.width * scale);
+    const height = Math.round(img.height * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("canvas unsupported");
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+    const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+    return { base64, mediaType: "image/jpeg", previewUrl: dataUrl };
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 export function PhotoUploader({ photos, onChange }: PhotoUploaderProps) {
@@ -29,13 +57,7 @@ export function PhotoUploader({ photos, onChange }: PhotoUploaderProps) {
     const remainingSlots = MAX_PHOTOS - photos.length;
     const files = Array.from(fileList).slice(0, remainingSlots);
 
-    const newPhotos = await Promise.all(
-      files.map(async (file) => {
-        const dataUrl = await readFileAsDataUrl(file);
-        const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
-        return { base64, mediaType: file.type, previewUrl: dataUrl };
-      }),
-    );
+    const newPhotos = await Promise.all(files.map((file) => resizeImage(file)));
 
     onChange([...photos, ...newPhotos]);
   }
