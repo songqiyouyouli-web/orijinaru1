@@ -89,7 +89,19 @@ export default function Home() {
             {loading ? "生成中..." : "出品文を生成する"}
           </button>
 
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {error && (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!canSubmit || loading}
+                className="self-start rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-200"
+              >
+                もう一度試す
+              </button>
+            </div>
+          )}
         </section>
 
         {aiOutput && (
