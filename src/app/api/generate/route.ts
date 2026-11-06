@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 
   try {
     const result = await generateText({
-      model: google("gemini-3.8-flash"),
+      model: google("gemini-3.6-flash"),
       system: buildSystemPrompt(),
       messages: [
         {
